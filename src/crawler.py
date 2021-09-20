@@ -53,8 +53,14 @@ class Crawler:
   
   def __insert_seeds_page(self, pages):
     for page in pages:
+      self.__add_new_page(page)
+  
+  def __add_new_page(self, page):
       self.__url_page_map[page.url] = page
       self.__domain_cnt_map[page.domain] += 1
+    page.update_novel_score(self.__domain_cnt_map[page.domain])
+    self.__pq.append(page)
+  
   def __check_url_scheme(self, url):
     return url.split(":")[0] in constant.acceptable_url_scheme
 
