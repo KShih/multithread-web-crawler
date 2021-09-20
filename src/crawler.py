@@ -28,7 +28,11 @@ class Crawler:
     self.__query_word = query_word
 
   def set_output_path(self, path):
-    self.__output_path = os.path.join(path, constant.OUTPUT_FILE_NAME)
+    abspath = os.path.abspath(path)
+    if os.stat(abspath):
+      self.__output_path = os.path.join(abspath, constant.OUTPUT_FILE_NAME)
+    else:
+      raise ValueError(constant.ERROR_OUTPUT_FILEPATH_NOT_FOUND + self.__output_path)
 
   def set_max_page(self, max_page):
     self.__max_pages = max_page
@@ -63,3 +67,12 @@ class Crawler:
         return False
     return True
 
+  def __get_output_log(self, page):
+    return f'{page.url}\t{-page.total_score}\t{page.depth}\t{page.download_time}\t{page.size}\n'
+
+  def __write_output(self, msg):
+    # TODO: chunk write
+    f = open(self.__output_path, "a")
+    f.write(msg)
+    f.close
+    self.__max_pages -= 1
