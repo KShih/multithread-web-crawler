@@ -61,6 +61,15 @@ class Crawler:
     page.update_novel_score(self.__domain_cnt_map[page.domain])
     self.__pq.append(page)
   
+  def __get_next_page(self):
+    heapq.heapify(self.__pq) # lazy update for total_score
+    next_page = heapq.heappop(self.__pq)
+    next_page.update_novel_score(self.__domain_cnt_map[next_page.domain])
+    while self.__pq and next_page.total_score > self.__pq[0].total_score: # updated_score is less, so enqueue and try again
+      heapq.heappush(self.__pq, next_page)
+      next_page = heapq.heappop(self.__pq)
+      next_page.update_novel_score(self.__domain_cnt_map[next_page.domain])
+    return next_page
   def __check_url_scheme(self, url):
     return url.split(":")[0] in constant.acceptable_url_scheme
 
