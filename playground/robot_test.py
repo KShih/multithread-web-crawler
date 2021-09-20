@@ -1,7 +1,9 @@
 import urllib.robotparser
 
-url = "http://www.musi-cal.com/"
-url_o = urlparse
 rp = urllib.robotparser.RobotFileParser()
-rp.set_url("http://www.musi-cal.com/robots.txt")
+robot_url = "https://www.nyu.edu/robots.txt"
+url = "https://www.nyu.edu/giving/give-now/?cid=1000102"
+
+rp.set_url(robot_url)
 rp.read()
+print(rp.can_fetch("*", url))
