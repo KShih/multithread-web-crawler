@@ -51,7 +51,15 @@ class Crawler:
     for page in pages:
       self.__url_page_map[page.url] = page
       self.__domain_cnt_map[page.domain] += 1
-      page.set_novel_score(self.__domain_cnt_map[page.domain])
-      heapq.heappush(self.__pq, page)
+  def __check_url_scheme(self, url):
+    return url.split(":")[0] in constant.acceptable_url_scheme
 
+  def __check_url_file_end(self, url):
+    return url.split(".")[-1] not in constant.blacklist_url_fileend
+
+  def __check_url_content(self, url):
+    for content in url.split("/"):
+      if content in constant.blacklist_url_content:
+        return False
+    return True
 
