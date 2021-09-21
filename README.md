@@ -46,24 +46,24 @@
 1. Take the query word and use the `googlesearch` to retrieve seeds page
 2. Add the seeds page to priority queue (pq)
 3. Start the multithread crawling process and run until crawled enough page
-    a. Each idle thread will take the page that has the maximum scores from pq
-    b. Update the total_score with the updated novel_score, and check if it’s still the best
-    c. If yes go to step `d`, if not repeat `a` and `b`
-    d. Crawling
-        i. Retrieve the plain html
-        ii. Parse the urls in this page, and deal with subpage by `urljoin`
-        iii. Check if it’s a valid page by
+    1. Each idle thread will take the page that has the maximum scores from pq
+    2. Update the total_score with the updated novel_score, and check if it’s still the best
+    3. If yes go to step `d`, if not repeat `a` and `b`
+    4. Crawling
+        1. Retrieve the plain html
+        2. Parse the urls in this page, and deal with subpage by `urljoin`
+        3. Check if it’s a valid page by
             1. The postfix that should be ignore, e.g.: index.html, index.htm
             2. The blacklist of the file end, e.g.: jpg, pdf, mp3 ...etc.
             3. The blacklist of the subpage, e.g.: cgi
             4. The only acceptable html scheme e.g.: http, https
                 1. Counter example: mailto, callto, javascript
-        iv. Check if it’s not being visited before
+        4. Check if it’s not being visited before
             1. If yes go to step `v`
             2. If no, update the importance score
-        v. Add page to pq by these steps
+        5. Add page to pq by these steps
             1. Adding this url to visited
             2. Adding the count of this domain (use for calculate the novelty score)
             3. Adding this page to pq
-    e. Write to the log file
+    5. Write to the log file
         1. I put a TODO here since I think it would be more efficient to bulk write instead of writing the log page by page
