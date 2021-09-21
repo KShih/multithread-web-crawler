@@ -6,6 +6,7 @@ import os
 import heapq
 import concurrent.futures
 import threading
+import logging
 from collections import defaultdict
 from urllib.parse import urljoin
 import urllib.error
@@ -27,6 +28,7 @@ class Crawler:
     self.__seed_size = None
     self.__output_path = None
     self.__max_pages = None
+    self.__logger = None
 
   def set_seed_size(self, seed_size):
     self.__seed_size = seed_size
@@ -40,7 +42,7 @@ class Crawler:
   def set_output_path(self, path):
     abspath = os.path.abspath(path)
     if os.stat(abspath):
-      self.__output_path = os.path.join(abspath, constant.OUTPUT_FILE_NAME)
+      self.__set_logger(os.path.join(abspath, constant.OUTPUT_FILE_NAME))
     else:
       raise ValueError(constant.ERROR_OUTPUT_FILEPATH_NOT_FOUND + self.__output_path)
 
@@ -48,7 +50,7 @@ class Crawler:
     self.__max_pages = max_page
 
   def run(self):
-    if not self.__seed_size or not self.__thread_pool_size or not self.__output_path or not self.__max_pages:
+    if not self.__seed_size or not self.__thread_pool_size or not self.__max_pages:
       raise ValueError(constant.ERROR_SETTING_IMCOMPLETE)
 
     self.__robot_ex_checker = RobotExChecker()
@@ -139,12 +141,27 @@ class Crawler:
         return False
     return True
 
+
+  def __set_logger(self, path):
+    logger = logging.getLogger("url_logger")
+    logger.setLevel(logging.DEBUG)
+    fh = logging.FileHandler(path)
+    fh.setLevel(logging.INFO)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.WARNING)
+
+    formatter = logging.Formatter('%(asctime)s %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    self.__logger = logger
+
   def __get_output_log(self, page):
-    return f'{page.url}\t{-page.total_score}\t{page.depth}\t{page.download_time}\t{page.size}\n'
+    return f'{page.url}\t{-page.total_score}\t{page.depth}\t{page.download_time}\t{page.size}'
       
   def __write_output(self, msg):
-    # TODO: chunk write
-    f = open(self.__output_path, "a")
-    f.write(msg)
-    f.close
+    self.__logger.info(msg)
     self.__max_pages -= 1
